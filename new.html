@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>Tasking Manager Dashboard</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no,width=device-width' />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/bootstrap-datetimepicker.css" />
+  <link rel="stylesheet" href="src/leaflet/leaflet.css" />
+  <link rel="stylesheet" href="css/main_new.css" />
+</head>
+<body>
+  <!-- barre en haut de l'écran -->
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <!-- bouton qui n'apparaît que sur petit écran quand le menu est collapsed -->
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#tab-controls" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <!-- titre de la barre de navigation -->
+        <a href="http://www.cartong.org/" target="_blank" class="navbar-left hidden-xs"><img src="images/cartong_logo.png" alt="CartONG logo"></a>
+        <a href="http://www.missingmaps.org/" target="_blank" class="navbar-left hidden-xs"><img src="images/mm_logo.png" alt="Missing Maps logo"></a>
+        <!-- deux versions selon la taille de l'écran -->
+        <span class="navbar-brand visible-xs">Mapathon Dashboard</span>
+        <span class="navbar-brand hidden-xs">Mapathon Task Manager Dashboard</span>
+      </div>
+      <button class="hidden-xs btn btn-success btn-xs" id="contribute">Contribute on GitHub</button>
+    </div>
+  </nav> 
+ 
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-sm-push-6 underlined-sm"> 
+        <div id="tab-controls" class="navbar-collapse collapse" aria-expanded="false">
+          <ul class="nav navbar-nav">
+            <li class="visible-xs"><a href="#"><i>Contribute on GitHub</i></a><hr></li>
+            <li><a href="#" id="open-form">Change current task</a></li>
+            <li><a href="#" class="close-form">Close task</a></li>
+            <li><a href="#">Add new task</a></li>
+          </ul>
+        </div><!--/.tab-controls -->
+      </div>
+
+      <div class="col-xs-12 col-sm-6 col-sm-pull-6 no-padding"> 
+        <ul class="nav nav-tabs">
+          <li class="active"><a data-toggle="tab" href="#task1">#1</a></li>
+          <li><a data-toggle="tab" href="#task2">#2</a></li>
+<!--          <li><a data-toggle="tab" href="#menu2">Menu 2</a></li>-->
+        </ul>
+      </div>
+    </div><!-- /row -->
+    
+    <div class="row">
+      <div class="col-xs-12 no-padding tab-content">
+        <div id="task1" class="tab-pane fade in active"><!-- Filled by templates #form-template and #task-template --></div>
+        <div id="task2" class="tab-pane fade"><!-- Filled by templates #form-template and #task-template --></div>
+<!--        <div id="menu2" class="tab-pane fade"></div>-->
+
+        <!-- TEMPLATES -->      
+        <template id="form-template">
+          <div class="col-xs-12 underlined-sm" id="task-choice">
+            <div class="row form-group">
+              <div class="col-xs-6 col-sm-4 bottom-column">
+                <label class="float-left">Task ID : </label>
+                <input type="number" class="form-control restricted-width float-left" id="task_number">
+              </div>
+              <div class="col-xs-6 col-sm-4 bottom-column">
+                <label class="float-left">Start Date: </label>
+                <div class="input-group restricted-width float-left" id='datetimepicker1'>
+                  <input type='text' id="startdate" class="form-control" />
+                  <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                  </span>
+                </div>
+              </div>
+              <div class="col-xs-10 col-sm-4 bottom-column">
+                <a href="#" class="btn btn-link close-form" role="button">&#10006;</a>
+                <a href="#" class="btn btn-default" id="go" role="button">Go</a>
+              </div>
+            </div>
+          </div>
+          <script type="text/javascript">$(function () {$('#datetimepicker1').datetimepicker();});</script>
+        </template><!-- /#form-template" -->
+        
+        <template id="task-template">
+          <div class="col-xs-12 col-sm-5">
+            <div class="row">
+              <div class="col-xs-12" id="map"></div>
+            </div>
+            <div class="row">
+              <div id="progress_bars" class="col-md-12">
+                <h4>Task progression</h4>
+                <div class="progress">
+                  <div id="validated_bar" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" style="width:0%">
+                  Validated
+                  </div>
+                  <div id="done_bar" class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width:0%">
+                  Done
+                  </div>
+                </div>
+              </div>
+            </div><!-- /row -->
+          </div><!-- /col -->
+          <div class="col-xs-12 col-sm-7">
+            <div class="row">
+              <div class="col-xs-12" id="task_title"><p></p><p></p></div>
+              <div class="col-xs-12" id="task_date"></div>
+              <div class="col-xs-12" id="buildings_id">
+                <h4><span id="nb_buildings"></span> Buildings</h4>
+              </div>
+            </div><!-- /row -->
+            <div class="row">
+              <div class="col-xs-6">
+                <div class="row">
+                  <div class="col-xs-12" id="landuse_id">
+                    <h4><span id="area_landuse"></span> km² of landuse</h4>
+                  </div>
+                  <div class="col-xs-12" id="map_length">
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-6">
+                <div class="row">
+                  <div class="col-xs-12" id="highways_id">  
+                    <h4><span id="km_highways"></span> km of roads</h4>
+                  </div>
+                  <div class="col-xs-12" id="graph_highways"></div>
+                </div>
+              </div>
+            </div><!-- /row -->
+          </div><!-- /col -->
+        </template><!-- /#task-template -->
+        
+      </div><!-- /col -->
+    </div><!-- /row -->
+  </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="src/d3/d3.min.js"></script>
+<script src="src/moment.js"></script>
+<script src="src/bootstrap-datetimepicker.js"></script>
+<script src="src/leaflet/leaflet.js"></script>
+<script src="src/app_new.js"></script>
+
+</body>
+
+</html>
