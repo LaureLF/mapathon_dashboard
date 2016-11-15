@@ -25,7 +25,7 @@ function loadDashboard() {
   var startdate_value = document.querySelector(".js-startdate").value;
 // tests
 //    var task_id = 2;
-  var startdate_value = "10/28/2016 9:44 AM";
+//  var startdate_value = "10/28/2016 9:44 AM";
   if (task_id && startdate_value) {
     start_date = new Date(startdate_value);
       	  
@@ -105,7 +105,7 @@ map_length.locate({setView: true, maxZoom: 16});
     
     //count buildings
     var buildings_count = [];
-    $.get("http://www.overpass-api.de/api/xapi?way[building=*][bbox="+bbox+"][@newer="+date_text+"][@meta]", function(buildings) {
+    $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[building=*][bbox="+bbox+"][@newer="+date_text+"][@meta]", function(buildings) {
     
         var building_geojson = osmtogeojson(buildings);
         for (var i in building_geojson.features)
@@ -141,7 +141,7 @@ map_length.locate({setView: true, maxZoom: 16});
 
     var highways_count = [];
     //count highway
-    $.get("http://www.overpass-api.de/api/xapi?way[highway=*][bbox="+bbox+"][@newer="+date_text+"][@meta]", function(highways) {
+    $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[highway=*][bbox="+bbox+"][@newer="+date_text+"][@meta]", function(highways) {
         
         var hw_geojson = osmtogeojson(highways);
         var length = 0;
@@ -242,7 +242,7 @@ map_length.locate({setView: true, maxZoom: 16});
 	
     var landuse_count = [];
     //count highway
-    $.get("http://www.overpass-api.de/api/xapi?way[landuse=*][bbox="+bbox+"][@newer="+date_text+"][@meta]", function(landuse) {
+    $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[landuse=*][bbox="+bbox+"][@newer="+date_text+"][@meta]", function(landuse) {
         
         var landuse_geojson = osmtogeojson(landuse);
         var area = 0;

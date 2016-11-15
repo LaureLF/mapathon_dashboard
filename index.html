@@ -63,7 +63,12 @@
     
     <div class="row">
       <div class="col-xs-12 no-padding tab-content">
-        <div id="tab1" class="tab-pane fade in active"><!-- Filled by templates #form-template and #task-template --></div>
+        <div id="tab1" class="tab-pane fade in active"><!-- Filled by templates #form-template and #task-template -->
+          <div class="js-dashboard">
+            <h3>Welcome to the Task Manager Dashboard !</h3>
+            <p>Please choose a task number and date and you will see all the details below.</p><br/>
+          </div>
+        </div>
         <div id="tab2" class="tab-pane fade"><!-- Filled by templates #form-template and #task-template --></div>
         <div id="tab3" class="tab-pane fade"><!-- Filled by templates #form-template and #task-template --></div>
         <div id="tab4" class="tab-pane fade"><!-- Filled by templates #form-template and #task-template --></div>
@@ -97,23 +102,23 @@
         <template id="task-template">
           <div class="js-dashboard">
             <div class="col-xs-12 col-sm-7">
-              <div class="row">
+              <div class="row border-green">
                 <div class="col-xs-12 js-task_title"></div>
                 <div class="col-xs-12 js-task_date"></div>
               </div><!-- /row -->
               <div class="row">
                 <div class="col-xs-6">
                   <div class="row">
-                    <div class="col-xs-12 js-buildings_id">
+                    <div class="col-xs-12 js-buildings_id border-cyan">
                       <h4><span id="nb_buildings"></span> Buildings</h4>
                     </div>
-                    <div class="col-xs-12 js-landuse_id">
+                    <div class="col-xs-12 js-landuse_id border-red">
                       <h4><span id="area_landuse"></span> km² of landuse</h4>
                     </div>
-                    <div class="col-xs-12 graph_area_class js-graph_area"></div>
+                    <div class="col-xs-12 graph_area_class js-graph_area border-red"></div>
                   </div>
                 </div>
-                <div class="col-xs-6">
+                <div class="col-xs-6 border-orange">
                   <div class="row">
                     <div class="col-xs-12 js-highways_id">  
                       <h4><span id="km_highways"></span> km of roads</h4>
