@@ -1,22 +1,82 @@
-function choosetask(){
+//var loading_value = 0;
+//function loading() {
+//  loading_value = loading_value+1;
+//  console.log(loading_value);
+//  document.getElementById('loading_bar').style.width= loading_value*25  +'%';
+//  if (loading_value==4){
+//  console.log("loaded");
+//  $("#loading").hide();
+//  $("#foo").hide();
+//} else {}
+//}
 
-}	
+
+function closeForm() {
+  $(".active > .js-task-choice").hide();
+}
+function openForm() {
+  $(".active > .js-task-choice").show();
+}
+
+function loadDashboard() {
+//  alert("go!");
+  var task_id = document.querySelector(".active .js-tasknumber").value; //TODO queryselector n'attrape que le 1er onglet
+//  alert(task_id);
+  var startdate_value = document.querySelector(".js-startdate").value;
+// tests
+//    var task_id = 2;
+  var startdate_value = "10/28/2016 9:44 AM";
+  if (task_id && startdate_value) {
+    start_date = new Date(startdate_value);
+      	  
+    d3.json("http://tasks.hotosm.org/project/"+task_id+".json", function(task) {    	
+      	if (task.geometry) {
+          createDashboard(task,start_date);
+      	} else {
+          alert("This task ID doesn't exist.");
+      	} 
+      });
+  } else {
+    alert("Veuillez remplir tous les champs.");
+  }
+}
 
 function createDashboard(task,start_date) {
     
     console.log("Creating the dasboard for task "+task.id+" and start date: "+start_date);
 
-    $("#task_title").innerHTML = "<h2>Task #"+task.id+" | "+task.properties.name+"</h2>";
-    $("#task_date").innerHTML = "<p><b>Since :</b> "+start_date+"</p>";
+    $(".active > .js-task-choice").hide();
+//    alert($(".active .js-dashboard").html());
+//    $(".active .js-dashboard").hide();
+    $(".active .js-dashboard").empty();
+//    alert($(".active .js-dashboard").html());
+    var tab = document.querySelector(".tab-pane.active");
+    var tasktemplate = document.querySelector('#task-template');
+    var dashboard = document.importNode(tasktemplate.content, true);
+    tab.appendChild(dashboard);
+      
+//    td[0].textContent = "0384";
+//    td[1].textContent = "Stuff2";
+// tests
+//    var tab2_test = document.querySelector("#tab2");
+//    var dashboard2_test = document.importNode(tasktemplate.content, true);
+//    tab2_test.appendChild(dashboard2_test);
+//    $('a[href="#tab2"]').text("Task 101010101010");
+    
+    var task_long_name = "Task # "+task.id+" | "+task.properties.name;
+ 	  $(".nav-tabs > li.active > a").text(task_long_name);
+    $(".active .js-task_title").html("<h3>"+ task_long_name +"</h3>");
+    $(".active .js-task_date").html("<p><b>Since :</b> "+start_date+"</p>");
+    
 //carte principale
-    var map = L.map("map").setView([0,0 ], 4);
+    var map = L.map($(".active .js-map")[0]).setView([0,0 ], 4);
 
     var OpenMapSurfer_Grayscale = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roadsg/x={x}&y={y}&z={z}', {
 	maxZoom: 19,
 	}).addTo(map);
 
 //carte length
-var map_length = L.map('map_length', { zoomControl:false, attributionControl: false }).setView([0,0 ], 4);
+var map_length = L.map($('.active .js-map_length')[0], { zoomControl:false, attributionControl: false }).setView([0,0 ], 4);
 map_length.locate({setView: true, maxZoom: 16});
     var bm_length  = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.{ext}', {
 	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyrigh">OpenStreetMap</a>',
@@ -41,7 +101,7 @@ map_length.locate({setView: true, maxZoom: 16});
     var bbox = ""+polygon_bounds._southWest.lng+","+polygon_bounds._southWest.lat+","+polygon_bounds._northEast.lng+","+polygon_bounds._northEast.lat+"";
     var date_text = start_date.toISOString();
     
-    loading();
+//    loading();
     
     //count buildings
     var buildings_count = [];
@@ -74,7 +134,7 @@ map_length.locate({setView: true, maxZoom: 16});
         
         
     nb_buildings.innerHTML = "<h1>"+buildings_count.length+"</h1>";
-    loading();
+//    loading();
     
     });    
         
@@ -159,7 +219,7 @@ map_length.locate({setView: true, maxZoom: 16});
     //////////////// pie chart highways per type
     
     var ndx;
-    var chart = dc.pieChart("#graph_highways");
+    var chart = dc.pieChart(".js-graph_highways");
     ndx = crossfilter(highways_count);
     var hw_graph_dim = ndx.dimension(function(d){return d.properties.tags.highway});
     var hw_graph_group = hw_graph_dim.group().reduceSum(function(d) {return d.properties.length});
@@ -175,7 +235,7 @@ map_length.locate({setView: true, maxZoom: 16});
     .renderLabel(true)
 	.render();
 	
-	loading();
+//	loading();
 	
 	
 	////////////////////////// landuse
@@ -196,7 +256,7 @@ map_length.locate({setView: true, maxZoom: 16});
             else{}
         
         }
-    loading();
+//    loading();
     
     var style_landuse = {
             "color": "#9ec658",
@@ -224,7 +284,7 @@ map_length.locate({setView: true, maxZoom: 16});
     
     // graph landuse
     var ndx2;
-    var chart2 = dc.pieChart("#graph_area");
+    var chart2 = dc.pieChart(".js-graph_area");
     ndx2 = crossfilter(landuse_count);
     var lu_graph_dim = ndx2.dimension(function(h){return h.properties.tags.landuse});
     var lu_graph_group = lu_graph_dim.group().reduceSum(function(h) {return h.properties.size});
@@ -257,7 +317,7 @@ function supportsTemplate() {
 
 if (supportsTemplate()) {
   // on récupère la div qu'on veut remplir
-  var tab1 = document.querySelector("#task1");
+  var tab1 = document.querySelector("#tab1");
   // on récupère le template et on le clone
   var formtemplate = document.querySelector('#form-template');
   var form1 = document.importNode(formtemplate.content, true);
@@ -265,52 +325,46 @@ if (supportsTemplate()) {
   tab1.appendChild(form1);
 
   // idem avec une autre div à remplir avec le même template
-  var tab2 = document.querySelector("#task2");
+  var tab2 = document.querySelector("#tab2");
   var form2 = document.importNode(formtemplate.content, true);
   tab2.appendChild(form2);
     
-//  var tasktemplate = document.querySelector('#task-template');
-//  var td = tasktemplate.content.querySelectorAll("p");
-//  td[0].textContent = "1235";
-//  td[1].textContent = "Stuff";
+  var tab3 = document.querySelector("#tab3");
+  var form3 = document.importNode(formtemplate.content, true);
+  tab3.appendChild(form3);
 
-//  var dashboard1 = document.importNode(tasktemplate.content, true);
-//  tab1.appendChild(dashboard1);
+  var tab4 = document.querySelector("#tab4");
+  var form4 = document.importNode(formtemplate.content, true);
+  tab4.appendChild(form4);
   
-//  td[0].textContent = "0384";
-//  td[1].textContent = "Stuff2";
-
-//  var clone2 = document.importNode(tasktemplate.content, true);
-//  tab2.appendChild(clone2);
-
-  $(".close-form").click(function(){
-    $(".active #task-choice").hide();
-  });
-  $("#open-form").click(function(){
-    $(".active #task-choice").show();
-  });
-  $("#go").click(function(){
-    var task_id = document.getElementById('task_number').value;
-    var startdate_value = document.getElementById('startdate').value;
-    if (task_id && startdate) {
-      start_date = new Date(startdate_value);
-
-      d3.json("http://tasks.hotosm.org/project/"+task_id+".json", function(task) {    	
-        	if (task.geometry) {
-            createDashboard(task,start_date);
-        	} else {
-        	alert("This task ID doesn't exist.");
-        	} 
-        });
-    } else {
-      alert("Veuillez remplir tous les champs.");
+  $('.nav-tabs > li > a[data-toggle="tab"]').on('hidden.bs.tab', function (e) {
+    // onglet fermé/hidden: $(e.target)
+    // onglet ouvert/shown: $(e.relatedTarget)
+//    alert("event fired");
+    tabtitle = $(e.target).text();
+    if (tabtitle.length >= 8) {
+      $(e.target).text(tabtitle.substring(5,8));
+    }
+    var newtitle = $(".tab-pane.active .js-task_title").text();
+    if (newtitle != "") {
+//      alert(newtitle);
+      $(e.relatedTarget).text(newtitle);
     }
   });
 
+//  $('.nav-tabs > li.active > a[data-toggle="tab"]').on('hidden.bs.tab', function (e) {
+    // onglet fermé/hidden: $(e.target)
+    // onglet ouvert/shown: $(e.relatedTarget)
+//    alert("event fired");
+//    $(e.target).text($(e.target).text().substring(5,8));
+//    var newtitle = $(".tab-pane.active .js-task_title").text();
+//    if (newtitle != "") {
+//      alert(newtitle);
+//      $(e.relatedTarget).text(newtitle);
+//    }
+//  });
 
 } else {
   alert("Problème de compatibilité avec votre navigateur.\nIl est temps de le mettre à jour et/ou d'abandonner InternetExplorer...");
   // TODO Use old templating techniques or libraries.
 }
-
-

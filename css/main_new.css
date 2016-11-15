@@ -70,32 +70,36 @@ body {
   max-width: 200px;
 /*  display: inline;*/
 }
-#task-choice {
+.task-choice {
   margin-bottom: 10px;
 }
-#task_title {
-  background-color: orange;
+.js-task_title {
+/*  background-color: orange;*/
   min-height:20px;
-/*  color:black*/
 }
-#task_date {
-  background-color: red;
+.js-task_date {
+/*  background-color: red;*/
   min-height:20px;
 }
 
 
-#map {
-  background-color: cyan;
-  min-height:200px;
+.js-map {
+/*  background-color: cyan;*/
+  min-height:400px;
 }
-#progress_bars {
-background-color: white;
+.js-progress_bars {
+  background-color: white;
 }
 .row + .row {
   margin-top: 10px
 }
-#buildings_id {
-  background-color: yellow;
+.js-buildings_id {
+/*  background-color: yellow;*/
   min-height:20px;
 }
-
+.js-map_length {
+  min-height:100px;
+}
+.js-graph_area {
+  color: black;
+}

@@ -8,7 +8,10 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
   <link rel="stylesheet" href="css/bootstrap-datetimepicker.css" />
   <link rel="stylesheet" href="src/leaflet/leaflet.css" />
+  <link rel="stylesheet" href="src/leaflet.label/leaflet.label.css" />
+  <link rel="stylesheet" type="text/css" href="src/dc/dc.css">
   <link rel="stylesheet" href="css/main_new.css" />
+  
 </head>
 <body>
   <!-- barre en haut de l'écran -->
@@ -40,106 +43,113 @@
         <div id="tab-controls" class="navbar-collapse collapse" aria-expanded="false">
           <ul class="nav navbar-nav">
             <li class="visible-xs"><a href="#"><i>Contribute on GitHub</i></a><hr></li>
-            <li><a href="#" id="open-form">Change current task</a></li>
-            <li><a href="#" class="close-form">Close task</a></li>
+            <li><a href="#" onClick="openForm(); return false;">Change current task</a></li>
+<!--            <li><a href="#" class="js-close-form">Close task</a></li>
             <li><a href="#">Add new task</a></li>
+-->
           </ul>
         </div><!--/.tab-controls -->
       </div>
 
       <div class="col-xs-12 col-sm-6 col-sm-pull-6 no-padding"> 
         <ul class="nav nav-tabs">
-          <li class="active"><a data-toggle="tab" href="#task1">#1</a></li>
-          <li><a data-toggle="tab" href="#task2">#2</a></li>
-<!--          <li><a data-toggle="tab" href="#menu2">Menu 2</a></li>-->
+          <li class="active"><a data-toggle="tab" href="#tab1">#  &hellip;</a></li>
+          <li><a data-toggle="tab" href="#tab2">#  &hellip;</a></li>
+          <li><a data-toggle="tab" href="#tab3">#  &hellip;</a></li>
+          <li><a data-toggle="tab" href="#tab4">#  &hellip;</a></li>
         </ul>
       </div>
     </div><!-- /row -->
     
     <div class="row">
       <div class="col-xs-12 no-padding tab-content">
-        <div id="task1" class="tab-pane fade in active"><!-- Filled by templates #form-template and #task-template --></div>
-        <div id="task2" class="tab-pane fade"><!-- Filled by templates #form-template and #task-template --></div>
-<!--        <div id="menu2" class="tab-pane fade"></div>-->
+        <div id="tab1" class="tab-pane fade in active"><!-- Filled by templates #form-template and #task-template --></div>
+        <div id="tab2" class="tab-pane fade"><!-- Filled by templates #form-template and #task-template --></div>
+        <div id="tab3" class="tab-pane fade"><!-- Filled by templates #form-template and #task-template --></div>
+        <div id="tab4" class="tab-pane fade"><!-- Filled by templates #form-template and #task-template --></div>
 
         <!-- TEMPLATES -->      
         <template id="form-template">
-          <div class="col-xs-12 underlined-sm" id="task-choice">
+          <div class="col-xs-12 underlined-sm js-task-choice">
             <div class="row form-group">
               <div class="col-xs-6 col-sm-4 bottom-column">
                 <label class="float-left">Task ID : </label>
-                <input type="number" class="form-control restricted-width float-left" id="task_number">
+                <input type="number" class="form-control restricted-width float-left js-tasknumber">
               </div>
               <div class="col-xs-6 col-sm-4 bottom-column">
                 <label class="float-left">Start Date: </label>
-                <div class="input-group restricted-width float-left" id='datetimepicker1'>
-                  <input type='text' id="startdate" class="form-control" />
+                <div class="input-group restricted-width float-left datetimepicker1">
+                  <input type='text' class="form-control js-startdate" />
                   <span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar"></span>
                   </span>
                 </div>
               </div>
               <div class="col-xs-10 col-sm-4 bottom-column">
-                <a href="#" class="btn btn-link close-form" role="button">&#10006;</a>
-                <a href="#" class="btn btn-default" id="go" role="button">Go</a>
+                <a href="#" class="btn btn-link" onClick="closeForm(); return false;" role="button">&#10006;</a>
+                <a href="#" class="btn btn-default" onClick="loadDashboard(); return false;"role="button">Go</a>
               </div>
             </div>
           </div>
-          <script type="text/javascript">$(function () {$('#datetimepicker1').datetimepicker();});</script>
+          <script type="text/javascript">$(function () {$('.datetimepicker1').datetimepicker();});</script>
         </template><!-- /#form-template" -->
         
         <template id="task-template">
-          <div class="col-xs-12 col-sm-5">
-            <div class="row">
-              <div class="col-xs-12" id="map"></div>
-            </div>
-            <div class="row">
-              <div id="progress_bars" class="col-md-12">
-                <h4>Task progression</h4>
-                <div class="progress">
-                  <div id="validated_bar" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" style="width:0%">
-                  Validated
-                  </div>
-                  <div id="done_bar" class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width:0%">
-                  Done
-                  </div>
-                </div>
-              </div>
-            </div><!-- /row -->
-          </div><!-- /col -->
-          <div class="col-xs-12 col-sm-7">
-            <div class="row">
-              <div class="col-xs-12" id="task_title"><p></p><p></p></div>
-              <div class="col-xs-12" id="task_date"></div>
-              <div class="col-xs-12" id="buildings_id">
-                <h4><span id="nb_buildings"></span> Buildings</h4>
-              </div>
-            </div><!-- /row -->
-            <div class="row">
-              <div class="col-xs-6">
-                <div class="row">
-                  <div class="col-xs-12" id="landuse_id">
-                    <h4><span id="area_landuse"></span> km² of landuse</h4>
-                  </div>
-                  <div class="col-xs-12" id="map_length">
+          <div class="js-dashboard">
+            <div class="col-xs-12 col-sm-7">
+              <div class="row">
+                <div class="col-xs-12 js-task_title"></div>
+                <div class="col-xs-12 js-task_date"></div>
+              </div><!-- /row -->
+              <div class="row">
+                <div class="col-xs-6">
+                  <div class="row">
+                    <div class="col-xs-12 js-buildings_id">
+                      <h4><span id="nb_buildings"></span> Buildings</h4>
+                    </div>
+                    <div class="col-xs-12 js-landuse_id">
+                      <h4><span id="area_landuse"></span> km² of landuse</h4>
+                    </div>
+                    <div class="col-xs-12 graph_area_class js-graph_area"></div>
                   </div>
                 </div>
-              </div>
-              <div class="col-xs-6">
-                <div class="row">
-                  <div class="col-xs-12" id="highways_id">  
-                    <h4><span id="km_highways"></span> km of roads</h4>
+                <div class="col-xs-6">
+                  <div class="row">
+                    <div class="col-xs-12 js-highways_id">  
+                      <h4><span id="km_highways"></span> km of roads</h4>
+                    </div>
+                    <div class="col-xs-12 js-map_length"></div>
+                    <div class="col-xs-12 js-graph_highways"></div>
                   </div>
-                  <div class="col-xs-12" id="graph_highways"></div>
                 </div>
+              </div><!-- /row -->
+            </div><!-- /col -->
+            <div class="col-xs-12 col-sm-5">
+              <div class="row">
+                <div class="col-xs-12 js-map"></div>
               </div>
-            </div><!-- /row -->
-          </div><!-- /col -->
+              <div class="row">
+                <div class="col-md-12 js-progress_bars">
+                  <h4>Task progression</h4>
+                  <div class="progress">
+                    <div id="validated_bar" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" style="width:0%">
+                    Validated
+                    </div>
+                    <div id="done_bar" class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width:0%">
+                    Done
+                    </div>
+                  </div>
+                </div>
+              </div><!-- /row -->
+            </div><!-- /col -->
+          </div><!-- /.js-dashboard -->
         </template><!-- /#task-template -->
+        <!-- END TEMPLATES --> 
         
       </div><!-- /col -->
     </div><!-- /row -->
   </div>
+  <!-- TODO logos class="visible-xs" -->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -147,6 +157,11 @@
 <script src="src/moment.js"></script>
 <script src="src/bootstrap-datetimepicker.js"></script>
 <script src="src/leaflet/leaflet.js"></script>
+<script src="src/osmtogeojson.js"></script>
+<script src="src/turf/turf.min.js"></script>
+<script src="src/leaflet.label/leaflet.label.js"></script>
+<script type="text/javascript" src="src/crossfilter/crossfilter.js"></script>
+<script type="text/javascript" src="src/dc/dc.js"></script>
 <script src="src/app_new.js"></script>
 
 </body>
