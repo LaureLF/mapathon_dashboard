@@ -127,8 +127,8 @@ body {
   border-bottom: 2px solid firebrick;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
-  border-top-left-radius: none;
-  border-top-right-radius: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 .border-orange {
   border: 2px solid orange;
