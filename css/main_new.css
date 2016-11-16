@@ -20,6 +20,9 @@ body {
 #contribute {
   float: right;
 }
+.navbar-collapse.in {
+  overflow-y: visible;
+}
 .nav-tabs li a {
   padding: 5px 10px;
 }
