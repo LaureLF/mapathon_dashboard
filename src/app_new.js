@@ -29,7 +29,7 @@ function loadDashboard() {
   if (task_id && startdate_value) {
     start_date = new Date(startdate_value);
       	  
-    d3.json("http://tasks.hotosm.org/project/"+task_id+".json", function(task) {    	
+    d3.json("https://tasks.hotosm.org/project/"+task_id+".json", function(task) {    	
       	if (task.geometry) {
           createDashboard(task,start_date);
       	} else {
