@@ -1,16 +1,3 @@
-//var loading_value = 0;
-//function loading() {
-//  loading_value = loading_value+1;
-//  console.log(loading_value);
-//  document.getElementById('loading_bar').style.width= loading_value*25  +'%';
-//  if (loading_value==4){
-//  console.log("loaded");
-//  $("#loading").hide();
-//  $("#foo").hide();
-//} else {}
-//}
-
-
 function closeForm() {
   $(".active > .js-task-choice").hide();
 }
@@ -19,18 +6,19 @@ function openForm() {
 }
 
 function loadDashboard() {
-//  alert("go!");
   var task_id = document.querySelector(".active .js-tasknumber").value; //TODO queryselector n'attrape que le 1er onglet
-//  alert(task_id);
   var startdate_value = document.querySelector(".js-startdate").value;
+
 // tests
 //    var task_id = 2;
 //  var startdate_value = "10/28/2016 9:44 AM";
   if (task_id && startdate_value) {
     start_date = new Date(startdate_value);
       	  
-    d3.json("http://tasks.hotosm.org/project/"+task_id+".json", function(task) {    	
-      	if (task.geometry) {
+    d3.json("http://tasks.hotosm.org/project/"+task_id+".json", function(task) { 
+        if (!task) {
+          alert ("This task does not exist or you do not have permission to access it.");
+        } else if (task.geometry) {
           createDashboard(task,start_date);
       	} else {
           alert("This task ID doesn't exist.");
@@ -45,28 +33,21 @@ function createDashboard(task,start_date) {
     
     console.log("Creating the dasboard for task "+task.id+" and start date: "+start_date);
 
-    $(".active > .js-task-choice").hide();
-//    alert($(".active .js-dashboard").html());
-//    $(".active .js-dashboard").hide();
-    $(".active .js-dashboard").empty();
-//    alert($(".active .js-dashboard").html());
+    $(".tab-pane.active > .js-task-choice").hide();
+    $(".tab-pane.active .js-dashboard").empty();
+
     var tab = document.querySelector(".tab-pane.active");
-    var tasktemplate = document.querySelector('#task-template');
-    var dashboard = document.importNode(tasktemplate.content, true);
+    var taskTemplate = document.querySelector('#task-template');
+    var dashboard = document.importNode(taskTemplate.content, true);
     tab.appendChild(dashboard);
-      
-//    td[0].textContent = "0384";
-//    td[1].textContent = "Stuff2";
-// tests
-//    var tab2_test = document.querySelector("#tab2");
-//    var dashboard2_test = document.importNode(tasktemplate.content, true);
-//    tab2_test.appendChild(dashboard2_test);
-//    $('a[href="#tab2"]').text("Task 101010101010");
     
-    var task_long_name = "Task # "+task.id+" | "+task.properties.name;
- 	  $(".nav-tabs > li.active > a").text(task_long_name);
-    $(".active .js-task_title").html("<h3>"+ task_long_name +"</h3>");
-    $(".active .js-task_date").html("<p><b>Since :</b> "+start_date+"</p>");
+    var longName = "Task # "+task.id+" | "+task.properties.name;
+    var tabName = longName.length <= 30 ? longName : longName.substring(5,30)+" …";
+    
+    document.querySelector(".tab-pane.active .js-task_title").dataset.tabname = tabName;
+ 	  $(".nav-tabs > li.active > a").text(tabName);
+    $(".tab-pane.active .js-task_title").html("<h3>"+ longName +"</h3>");
+    $(".tab-pane.active .js-task_date").html("<p><b>Since :</b> "+start_date+"</p>");
     
 //carte principale
     var map = L.map($(".active .js-map")[0]).setView([0,0 ], 4);
@@ -319,52 +300,48 @@ if (supportsTemplate()) {
   // on récupère la div qu'on veut remplir
   var tab1 = document.querySelector("#tab1");
   // on récupère le template et on le clone
-  var formtemplate = document.querySelector('#form-template');
-  var form1 = document.importNode(formtemplate.content, true);
+  var formTemplate = document.querySelector('#form-template');
+  var form1 = document.importNode(formTemplate.content, true);
   // on le charge dans le HTML
   tab1.appendChild(form1);
 
   // idem avec une autre div à remplir avec le même template
   var tab2 = document.querySelector("#tab2");
-  var form2 = document.importNode(formtemplate.content, true);
+  var form2 = document.importNode(formTemplate.content, true);
   tab2.appendChild(form2);
     
   var tab3 = document.querySelector("#tab3");
-  var form3 = document.importNode(formtemplate.content, true);
+  var form3 = document.importNode(formTemplate.content, true);
   tab3.appendChild(form3);
 
   var tab4 = document.querySelector("#tab4");
-  var form4 = document.importNode(formtemplate.content, true);
+  var form4 = document.importNode(formTemplate.content, true);
   tab4.appendChild(form4);
   
   $('.nav-tabs > li > a[data-toggle="tab"]').on('hidden.bs.tab', function (e) {
     // onglet fermé/hidden: $(e.target)
     // onglet ouvert/shown: $(e.relatedTarget)
-//    alert("event fired");
-    tabtitle = $(e.target).text();
-    if (tabtitle.length >= 8) {
-      $(e.target).text(tabtitle.substring(5,8));
-    }
-    var newtitle = $(".tab-pane.active .js-task_title").text();
-    if (newtitle != "") {
-//      alert(newtitle);
-      $(e.relatedTarget).text(newtitle);
+    var hiddenTitle = $(e.target).text().match(/#.*\|/).toString().slice(0,-2);
+    $(e.target).text(hiddenTitle);
+    var newTitle = $(".tab-pane.active .js-task_title").data('tabname')
+    if (newTitle != "") {
+      $(e.relatedTarget).text(newTitle);
     }
   });
-
-//  $('.nav-tabs > li.active > a[data-toggle="tab"]').on('hidden.bs.tab', function (e) {
-    // onglet fermé/hidden: $(e.target)
-    // onglet ouvert/shown: $(e.relatedTarget)
-//    alert("event fired");
-//    $(e.target).text($(e.target).text().substring(5,8));
-//    var newtitle = $(".tab-pane.active .js-task_title").text();
-//    if (newtitle != "") {
-//      alert(newtitle);
-//      $(e.relatedTarget).text(newtitle);
-//    }
-//  });
 
 } else {
   alert("Problème de compatibilité avec votre navigateur.\nIl est temps de le mettre à jour et/ou d'abandonner InternetExplorer...");
   // TODO Use old templating techniques or libraries.
 }
+
+//var loading_value = 0;
+//function loading() {
+//  loading_value = loading_value+1;
+//  console.log(loading_value);
+//  document.getElementById('loading_bar').style.width= loading_value*25  +'%';
+//  if (loading_value==4){
+//  console.log("loaded");
+//  $("#loading").hide();
+//  $("#foo").hide();
+//} else {}
+//}

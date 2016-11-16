@@ -73,7 +73,7 @@ body {
     vertical-align: bottom;
 }
 .restricted-width {
-  max-width: 200px;
+  max-width: 250px;
 /*  display: inline;*/
 }
 .task-choice {
