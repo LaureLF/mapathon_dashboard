@@ -1,3 +1,16 @@
+function dateTimePick() {
+  $('.datetimepicker1').datetimepicker({
+    sideBySide:true
+  });
+  $('.datetimepicker2').datetimepicker({
+    sideBySide:true,
+    defaultDate: moment()
+  });
+}
+function toggleEndDate() {
+  var input = $(".js-enddate");
+  input.prop("disabled", input.prop("disabled") ? false : true);
+}
 function closeForm() {
   $(".active > .js-task-choice").hide();
 }
@@ -5,9 +18,11 @@ function openForm() {
   $(".active > .js-task-choice").show();
 }
 
+
 function loadDashboard() {
   var task_id = document.querySelector(".active .js-tasknumber").value; //TODO queryselector n'attrape que le 1er onglet
   var startdate_value = document.querySelector(".js-startdate").value;
+  var enddate_value = document.querySelector(".js-enddate").value;
 
 // tests
 //    var task_id = 2;
@@ -29,8 +44,7 @@ function loadDashboard() {
   }
 }
 
-function createDashboard(task,start_date) {
-    
+function createDashboard(task,start_date, end_date=null) {
     console.log("Creating the dasboard for task "+task.id+" and start date: "+start_date);
 
     $(".tab-pane.active > .js-task-choice").hide();

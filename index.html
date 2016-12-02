@@ -77,11 +77,11 @@
         <template id="form-template">
           <div class="col-xs-12 underlined-sm js-task-choice">
             <div class="row form-group">
-              <div class="col-xs-6 col-sm-4 bottom-column">
+              <div class="col-xs-2 col-sm-3 bottom-column">
                 <label class="float-left">Task ID : </label>
                 <input type="number" class="form-control restricted-width float-left js-tasknumber">
               </div>
-              <div class="col-xs-6 col-sm-4 bottom-column">
+              <div class="col-xs-5 col-sm-3 bottom-column">
                 <label class="float-left">Start Date: </label>
                 <div class="input-group restricted-width float-left datetimepicker1">
                   <input type='text' class="form-control js-startdate" />
@@ -90,13 +90,22 @@
                   </span>
                 </div>
               </div>
-              <div class="col-xs-10 col-sm-4 bottom-column">
+              <div class="col-xs-5 col-sm-3 bottom-column">
+                <label class="float-left"><input type="checkbox" value="" onClick="toggleEndDate();"> End Date: </label>
+                <div class="input-group restricted-width float-left datetimepicker2">
+                  <input type='text' class="form-control js-enddate" id="test" disabled/>
+                  <span class="input-group-addon" data-toggle="tooltip" title="Double click for current date and time.">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                  </span>
+                </div>
+              </div>
+              <div class="col-xs-10 col-sm-3 bottom-column">
                 <a href="#" class="btn btn-link" onClick="closeForm(); return false;" role="button">&#10006;</a>
                 <a href="#" class="btn btn-default" onClick="loadDashboard(); return false;"role="button">Go</a>
               </div>
             </div>
           </div>
-          <script type="text/javascript">$(function () {$('.datetimepicker1').datetimepicker();});</script>
+          <script type="text/javascript">dateTimePick();</script>
         </template><!-- /#form-template" -->
         
         <template id="task-template">
