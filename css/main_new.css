@@ -57,6 +57,9 @@ body {
 .float-left {
   float:left;
 }
+.datetimepicker2 {
+  visibility: hidden;
+}
 .form-group label {
   padding: 3px 10px;
 }

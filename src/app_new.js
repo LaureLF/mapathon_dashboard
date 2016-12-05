@@ -4,12 +4,12 @@ function dateTimePick() {
   });
   $('.datetimepicker2').datetimepicker({
     sideBySide:true,
-    defaultDate: moment()
   });
 }
 function toggleEndDate() {
-  var input = $(".js-enddate");
-  input.prop("disabled", input.prop("disabled") ? false : true);
+  var input = $(".datetimepicker2");
+// désactivé tant que le filtre par date de fin n'est pas opérationnel sur le xml
+//  input.css('visibility', input.css('visibility') == 'hidden' ? 'visible' : 'hidden');
 }
 function closeForm() {
   $(".active > .js-task-choice").hide();
@@ -20,21 +20,26 @@ function openForm() {
 
 
 function loadDashboard() {
-  var task_id = document.querySelector(".active .js-tasknumber").value; //TODO queryselector n'attrape que le 1er onglet
-  var startdate_value = document.querySelector(".js-startdate").value;
-  var enddate_value = document.querySelector(".js-enddate").value;
+  var task_id = document.querySelector(".active .js-tasknumber").value;
+  var startdate_value = document.querySelector(".js-startdate").value; // identique à start_date2
+//  start_date = new Date(startdate_value);  // Fri Dec 02 2016 20:56:00 GMT-0500 (EST)
+//  start_date2 = moment(startdate_value).format("MM/DD/YYYY hh:mm a"); // identique à la valeur de sortie de l'input
+//  date_text = start_date.toISOString(); // identique au suivant
+  startdate_text = moment(startdate_value, "MM/DD/YYYY hh:mm a").toISOString(); // identique au précédent
+
+  var enddate_input = $(".js-enddate");
+  var enddate_value = enddate_input.css('visibility') == 'hidden' ? moment().format() : enddate_input.val();
 
 // tests
 //    var task_id = 2;
 //  var startdate_value = "10/28/2016 9:44 AM";
-  if (task_id && startdate_value) {
-    start_date = new Date(startdate_value);
-      	  
+  if (task_id && startdate_value) {      	  
+    history.pushState(null, null, "?task="+task_id); // TODO gérer les 4 onglets + append (not replace url)
     d3.json("http://tasks.hotosm.org/project/"+task_id+".json", function(task) { 
         if (!task) {
           alert ("This task does not exist or you do not have permission to access it.");
         } else if (task.geometry) {
-          createDashboard(task,start_date);
+          createDashboard(task,startdate_text);
       	} else {
           alert("This task ID doesn't exist.");
       	} 
@@ -61,7 +66,7 @@ function createDashboard(task,start_date, end_date=null) {
     document.querySelector(".tab-pane.active .js-task_title").dataset.tabname = tabName;
  	  $(".nav-tabs > li.active > a").text(tabName);
     $(".tab-pane.active .js-task_title").html("<h3>"+ longName +"</h3>");
-    $(".tab-pane.active .js-task_date").html("<p><b>Since :</b> "+start_date+"</p>");
+    $(".tab-pane.active .js-task_date").html("<p><b>Since :</b> "+moment(start_date).format("llll")+"</p>");
     
 //carte principale
     var map = L.map($(".active .js-map")[0]).setView([0,0 ], 4);
@@ -94,7 +99,8 @@ map_length.locate({setView: true, maxZoom: 16});
     var polygon_bounds = task_polygon.getBounds();
 
     var bbox = ""+polygon_bounds._southWest.lng+","+polygon_bounds._southWest.lat+","+polygon_bounds._northEast.lng+","+polygon_bounds._northEast.lat+"";
-    var date_text = start_date.toISOString();
+//    var date_text = start_date.toISOString();
+    var date_text =  start_date;
     
 //    loading();
     
