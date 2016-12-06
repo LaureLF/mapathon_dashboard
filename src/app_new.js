@@ -1,3 +1,7 @@
+var query = "", 
+    parameters = {}, 
+    tabNumber = 0;
+
 function dateTimePick() {
   $('.datetimepicker1').datetimepicker({
     sideBySide:true
@@ -18,39 +22,75 @@ function openForm() {
   $(".active > .js-task-choice").show();
 }
 
+function init() {
+  query = window.location.search ; 
+  tabNumber = $('.tab-content .tab-pane.active').attr('id').slice(3);
+
+  if (query !== "") {
+    parameters = {};
+    query.substr(1).split("&").forEach(function(item) {
+      var s = item.split("=");
+      var key = s[0];
+      var value = s[1] && decodeURIComponent(s[1]);
+      (key in parameters) ? parameters[key].push(value) : parameters[key] = [value];
+    })
+// if task1 et start1: ci-dessous, else if task2 et start2 etc.
+    d3.json("http://tasks.hotosm.org/project/"+parameters['task'+tabNumber]+".json", function(task) { 
+      if (!task) {
+        alert ("This task does not exist or you do not have permission to access it.");
+      } else if (task.geometry) {
+        createDashboard(task,parameters["start"+tabNumber]);
+      } else {
+        alert("This task has no geometry attribute.");
+      } 
+    });
+  }
+}
 
 function loadDashboard() {
-  var task_id = document.querySelector(".active .js-tasknumber").value;
-  var startdate_value = document.querySelector(".js-startdate").value; // identique à start_date2
-//  start_date = new Date(startdate_value);  // Fri Dec 02 2016 20:56:00 GMT-0500 (EST)
-//  start_date2 = moment(startdate_value).format("MM/DD/YYYY hh:mm a"); // identique à la valeur de sortie de l'input
-//  date_text = start_date.toISOString(); // identique au suivant
-  startdate_text = moment(startdate_value, "MM/DD/YYYY hh:mm a").toISOString(); // identique au précédent
-
-  var enddate_input = $(".js-enddate");
-  var enddate_value = enddate_input.css('visibility') == 'hidden' ? moment().format() : enddate_input.val();
-
+  var taskID = document.querySelector(".active .js-tasknumber").value;
+  var startDateValue = document.querySelector(".active .js-startdate").value;
 // tests
-//    var task_id = 2;
-//  var startdate_value = "10/28/2016 9:44 AM";
-  if (task_id && startdate_value) {      	  
-    history.pushState(null, null, "?task="+task_id); // TODO gérer les 4 onglets + append (not replace url)
-    d3.json("http://tasks.hotosm.org/project/"+task_id+".json", function(task) { 
-        if (!task) {
-          alert ("This task does not exist or you do not have permission to access it.");
-        } else if (task.geometry) {
-          createDashboard(task,startdate_text);
-      	} else {
-          alert("This task ID doesn't exist.");
-      	} 
-      });
+//  var taskID = 2;
+//  var startDateValue = "10/28/2016 9:44 AM";
+
+  var startDateText = moment(startDateValue, "MM/DD/YYYY hh:mm a").toISOString();
+  var endDateInput = $(".js-enddate");
+  var endDateValue = endDateInput.css('visibility') == 'hidden' ? moment().format() : endDateInput.val();
+
+  if (taskID && startDateValue) {
+    tabNumber = $('.tab-content .tab-pane.active').attr('id').slice(3);  
+    var task = "task"+tabNumber;
+    var start = "start"+tabNumber;
+    if (query === "") {
+      history.pushState(null, null, "?"+task+"="+taskID+"&"+start+"="+startDateText);
+    } else {
+      parameters[task] = taskID;
+      parameters[start] = startDateText;
+
+      query = "?";
+      for (var key in parameters) {
+        query += key + "=" + parameters[key] + "&";
+      }
+      history.pushState(null, null, query.slice(0, -1));
+    }
+    d3.json("http://tasks.hotosm.org/project/"+taskID+".json", function(task) { 
+      if (!task) {
+        alert ("This task does not exist or you do not have permission to access it.");
+      } else if (task.geometry) {
+        createDashboard(task,startDateText);
+      } else {
+        alert("This task has no geometry attribute.");
+      } 
+    });
+
   } else {
     alert("Veuillez remplir tous les champs.");
   }
 }
 
-function createDashboard(task,start_date, end_date=null) {
-    console.log("Creating the dasboard for task "+task.id+" and start date: "+start_date);
+function createDashboard(task,startDate, endDate=null) {
+    console.log("Creating the dasboard for task "+task.id+" and start date: "+startDate);
 
     $(".tab-pane.active > .js-task-choice").hide();
     $(".tab-pane.active .js-dashboard").empty();
@@ -66,7 +106,7 @@ function createDashboard(task,start_date, end_date=null) {
     document.querySelector(".tab-pane.active .js-task_title").dataset.tabname = tabName;
  	  $(".nav-tabs > li.active > a").text(tabName);
     $(".tab-pane.active .js-task_title").html("<h3>"+ longName +"</h3>");
-    $(".tab-pane.active .js-task_date").html("<p><b>Since :</b> "+moment(start_date).format("llll")+"</p>");
+    $(".tab-pane.active .js-task_date").html("<p><b>Since :</b> "+moment(startDate.toString()).format("llll")+"</p>");
     
 //carte principale
     var map = L.map($(".active .js-map")[0]).setView([0,0 ], 4);
@@ -84,7 +124,7 @@ map_length.locate({setView: true, maxZoom: 16});
 	minZoom: 0,
 	maxZoom: 20,
 	ext: 'png'
-}).addTo(map_length);
+    }).addTo(map_length);
 
     var style_aoi = {
     	"color": "#f9ec12",
@@ -99,14 +139,12 @@ map_length.locate({setView: true, maxZoom: 16});
     var polygon_bounds = task_polygon.getBounds();
 
     var bbox = ""+polygon_bounds._southWest.lng+","+polygon_bounds._southWest.lat+","+polygon_bounds._northEast.lng+","+polygon_bounds._northEast.lat+"";
-//    var date_text = start_date.toISOString();
-    var date_text =  start_date;
     
 //    loading();
     
     //count buildings
     var buildings_count = [];
-    $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[building=*][bbox="+bbox+"][@newer="+date_text+"][@meta]", function(buildings) {
+    $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[building=*][bbox="+bbox+"][@newer="+startDate+"][@meta]", function(buildings) {
     
         var building_geojson = osmtogeojson(buildings);
         for (var i in building_geojson.features)
@@ -142,19 +180,18 @@ map_length.locate({setView: true, maxZoom: 16});
 
     var highways_count = [];
     //count highway
-    $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[highway=*][bbox="+bbox+"][@newer="+date_text+"][@meta]", function(highways) {
+    $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[highway=*][bbox="+bbox+"][@newer="+startDate+"][@meta]", function(highways) {
         
         var hw_geojson = osmtogeojson(highways);
         var length = 0;
         
         for (var i in hw_geojson.features)
         {
-        var item = hw_geojson.features[i];
+          var item = hw_geojson.features[i];
         
-        	if (item.geometry.type =="LineString") {
+      	  if (item.geometry.type =="LineString") {
             highways_count.push(item)
-            }
-            else{}
+          } else {}
         }
         
         var style_highways = {
@@ -162,26 +199,23 @@ map_length.locate({setView: true, maxZoom: 16});
             "weight": 2,
             "fillOpacity": 1,
             "opacity": 1,
-        	};
+        };
         	
         var highways_layer = L.geoJson(highways_count,{style: style_highways})
         .addTo(map);
         
         for (var i in highways_count)
         {
-        var item = highways_count[i];
-        
-        item.date = new Date(item.properties.meta.timestamp)
-        
-        var length_obj = turf.lineDistance(highways_count[i], 'kilometers');
-        length = length+length_obj
-            
-        highways_count[i].properties.length = length_obj;
+          var item = highways_count[i];
+          item.date = new Date(item.properties.meta.timestamp);
+          var length_obj = turf.lineDistance(highways_count[i], 'kilometers');
+          length = length+length_obj
+          highways_count[i].properties.length = length_obj;
         }
         
         length = Math.round(length * 10) / 10;
         
-    km_highways.innerHTML = "<h1>"+length+"</h1>";
+        km_highways.innerHTML = "<h1>"+length+"</h1>";
     
     // draw line corresponding of length
     var pt1 = turf.point([5.9215,45.58789]);
@@ -220,7 +254,7 @@ map_length.locate({setView: true, maxZoom: 16});
     //////////////// pie chart highways per type
     
     var ndx;
-    var chart = dc.pieChart(".js-graph_highways");
+    var chart = dc.pieChart(".tab-pane.active .js-graph_highways");
     ndx = crossfilter(highways_count);
     var hw_graph_dim = ndx.dimension(function(d){return d.properties.tags.highway});
     var hw_graph_group = hw_graph_dim.group().reduceSum(function(d) {return d.properties.length});
@@ -243,7 +277,7 @@ map_length.locate({setView: true, maxZoom: 16});
 	
     var landuse_count = [];
     //count highway
-    $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[landuse=*][bbox="+bbox+"][@newer="+date_text+"][@meta]", function(landuse) {
+    $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[landuse=*][bbox="+bbox+"][@newer="+startDate+"][@meta]", function(landuse) {
         
         var landuse_geojson = osmtogeojson(landuse);
         var area = 0;
@@ -285,7 +319,7 @@ map_length.locate({setView: true, maxZoom: 16});
     
     // graph landuse
     var ndx2;
-    var chart2 = dc.pieChart(".js-graph_area");
+    var chart2 = dc.pieChart(".tab-pane.active .js-graph_area");
     ndx2 = crossfilter(landuse_count);
     var lu_graph_dim = ndx2.dimension(function(h){return h.properties.tags.landuse});
     var lu_graph_group = lu_graph_dim.group().reduceSum(function(h) {return h.properties.size});
@@ -303,7 +337,7 @@ map_length.locate({setView: true, maxZoom: 16});
     
     });
     
-	});
+});
 
 /////progress bar
 document.getElementById('validated_bar').style.width= task.properties.validated  +'%';
@@ -341,8 +375,11 @@ if (supportsTemplate()) {
   $('.nav-tabs > li > a[data-toggle="tab"]').on('hidden.bs.tab', function (e) {
     // onglet fermé/hidden: $(e.target)
     // onglet ouvert/shown: $(e.relatedTarget)
-    var hiddenTitle = $(e.target).text().match(/#.*\|/).toString().slice(0,-2);
-    $(e.target).text(hiddenTitle);
+    tabNumber = $('.tab-content .tab-pane.active').attr('id').slice(3);
+    var shortenedTitle = $(e.target).text().match(/#.*\|/);
+    if (shortenedTitle) {
+      $(e.target).text(shortenedTitle.toString().slice(0,-2));
+    }
     var newTitle = $(".tab-pane.active .js-task_title").data('tabname')
     if (newTitle != "") {
       $(e.relatedTarget).text(newTitle);
@@ -350,7 +387,7 @@ if (supportsTemplate()) {
   });
 
 } else {
-  alert("Problème de compatibilité avec votre navigateur.\nIl est temps de le mettre à jour et/ou d'abandonner InternetExplorer...");
+  alert("Problème de compatibilité avec votre navigateur.\nIl est temps de le mettre à jour et/ou d'abandonner InternetExplorer.");
   // TODO Use old templating techniques or libraries.
 }
 
@@ -360,8 +397,8 @@ if (supportsTemplate()) {
 //  console.log(loading_value);
 //  document.getElementById('loading_bar').style.width= loading_value*25  +'%';
 //  if (loading_value==4){
-//  console.log("loaded");
-//  $("#loading").hide();
-//  $("#foo").hide();
-//} else {}
+//    console.log("loaded");
+//    $("#loading").hide();
+//    $("#foo").hide();
+//  } else {}
 //}
