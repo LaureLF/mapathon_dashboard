@@ -104,22 +104,25 @@ function createDashboard(task,startDate, endDate=null) {
     var tabName = longName.length <= 30 ? longName : longName.substring(5,30)+" …";
     
     document.querySelector(".tab-pane.active .js-task_title").dataset.tabname = tabName;
- 	  $(".nav-tabs > li.active > a").text(tabName);
+    $(".nav-tabs > li.active > a").text(tabName);
     $(".tab-pane.active .js-task_title").html("<h3>"+ longName +"</h3>");
     $(".tab-pane.active .js-task_date").html("<p><b>Since :</b> "+moment(startDate.toString()).format("llll")+"</p>");
+    $("#km_highways").attr('id', 'km_highways_'+tabNumber);
+    $("#area_landuse").attr('id', 'area_landuse_'+tabNumber);
     
 //carte principale
-    var map = L.map($(".active .js-map")[0]).setView([0,0 ], 4);
+    var map = L.map($(".tab-pane.active .js-map")[0]).setView([0,0 ], 4);
 
     var OpenMapSurfer_Grayscale = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roadsg/x={x}&y={y}&z={z}', {
+	attribution: 'Map tiles by <a href="" target="_blank">korona.geog.uni-heidelberg.de</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, ODbL',
 	maxZoom: 19,
 	}).addTo(map);
 
 //carte length
-var map_length = L.map($('.active .js-map_length')[0], { zoomControl:false, attributionControl: false }).setView([0,0 ], 4);
+var map_length = L.map($('.tab-pane.active .js-map_length')[0], { zoomControl:false, attributionControl: true }).setView([0,0 ], 4);
 map_length.locate({setView: true, maxZoom: 16});
     var bm_length  = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.{ext}', {
-	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyrigh">OpenStreetMap</a>',
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, ODbL',
 	subdomains: 'abcd',
 	minZoom: 0,
 	maxZoom: 20,
@@ -172,7 +175,7 @@ map_length.locate({setView: true, maxZoom: 16});
         buildings_layer.bringToFront();
         
         
-    nb_buildings.innerHTML = "<h1>"+buildings_count.length+"</h1>";
+    nb_buildings.innerHTML = buildings_count.length;
 //    loading();
     
     });    
@@ -214,8 +217,12 @@ map_length.locate({setView: true, maxZoom: 16});
         }
         
         length = Math.round(length * 10) / 10;
-        
-        km_highways.innerHTML = "<h1>"+length+"</h1>";
+
+        // awful but need to understand first element before improving
+        if (tabNumber == 1) {km_highways_1.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";} // TODO bon décompte ?
+        else if (tabNumber == 2) {km_highways_2.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
+        else if (tabNumber == 3) {km_highways_3.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
+        else {km_highways_4.innerHTML = length+" km of roads<br>"+ highways_count.length +" roades created";}
     
     // draw line corresponding of length
     var pt1 = turf.point([5.9215,45.58789]);
@@ -315,7 +322,12 @@ map_length.locate({setView: true, maxZoom: 16});
     area = area/1000000;
     area = Math.round(area * 100) / 100;
     
-    area_landuse.innerHTML = "<h1>"+area+"</h1>";
+    // awful but needs further comprehension to be improved
+    if (tabNumber == 1) {area_landuse_1.innerHTML = area+" km² of landuse<br>" ;}//+ landuse_count.length +  "<i> landuse count?<i>" ;}
+    else if (tabNumber == 2) {area_landuse_2.innerHTML = area;}
+    else if (tabNumber == 3) {area_landuse_3.innerHTML = area;}
+    else {area_landuse_4.innerHTML = area;}        
+//    area_landuse.innerHTML = "<h1>"+area+"</h1>";
     
     // graph landuse
     var ndx2;
