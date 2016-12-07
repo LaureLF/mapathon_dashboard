@@ -25,7 +25,7 @@ function openForm() {
 
 function init() {
   query = window.location.search ; 
-  tabNumber = $('.tab-content .tab-pane.active').attr('id').slice(3);
+  tabNumber = Number($('.tab-content .tab-pane.active').attr('id').slice(3));
   tabText = tabNumber.toString();
 
   if (query !== "") {
@@ -75,7 +75,7 @@ function loadDashboard() {
   var endDateValue = endDateInput.css('visibility') == 'hidden' ? moment().format() : endDateInput.val();
 
   if (taskID && startDateValue) {
-    tabNumber = $('.tab-content .tab-pane.active').attr('id').slice(3);  
+    tabNumber = Number($('.tab-content .tab-pane.active').attr('id').slice(3));  
     tabText = tabNumber.toString();
     var task = "task"+tabText;
     var start = "start"+tabText;
@@ -191,10 +191,10 @@ map_length.locate({setView: true, maxZoom: 16});
         buildings_layer.bringToFront();
         
         // awful but need to understand first element before improving
-        if (tabNumber == 0) {nb_buildings_0.innerHTML = buildings_count.length +" buildings";} 
-        else if (tabNumber == 1) {nb_buildings_1.innerHTML = buildings_count.length +" buildings";} 
-        else if (tabNumber == 2) {nb_buildings_2.innerHTML = buildings_count.length+" buildings";}
-        else if (tabNumber == 3) {nb_buildings_3.innerHTML = buildings_count.length+ " buildings";}
+        if (tabNumber === 0) {nb_buildings_0.innerHTML = buildings_count.length +" buildings";} 
+        else if (tabNumber === 1) {nb_buildings_1.innerHTML = buildings_count.length +" buildings";} 
+        else if (tabNumber === 2) {nb_buildings_2.innerHTML = buildings_count.length+" buildings";}
+        else if (tabNumber === 3) {nb_buildings_3.innerHTML = buildings_count.length+ " buildings";}
         else {alert("Problème d'onglets, veuillez recharger votre navigateur.");}
         
 //    loading();
@@ -240,10 +240,10 @@ map_length.locate({setView: true, maxZoom: 16});
         length = Math.round(length * 10) / 10;
 
         // awful but need to understand first element before improving
-        if (tabNumber == 0) {km_highways_0.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";} // TODO bon décompte ?
-        else if (tabNumber == 1) {km_highways_1.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
-        else if (tabNumber == 2) {km_highways_2.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
-        else if (tabNumber == 3) {km_highways_3.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
+        if (tabNumber === 0) {km_highways_0.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";} // TODO bon décompte ?
+        else if (tabNumber === 1) {km_highways_1.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
+        else if (tabNumber === 2) {km_highways_2.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
+        else if (tabNumber === 3) {km_highways_3.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
         else {alert("Problème d'onglets, veuillez recharger votre navigateur.");}        
     
     // draw line corresponding of length
@@ -345,10 +345,10 @@ map_length.locate({setView: true, maxZoom: 16});
     area = Math.round(area * 100) / 100;
     
     // awful but needs further comprehension to be improved
-    if (tabNumber == 0) {area_landuse_0.innerHTML = area+" km² of landuse<br>" ;}//+ landuse_count.length +  "<i> landuse count?<i>" ;}
-    else if (tabNumber == 1) {area_landuse_1.innerHTML = area +" km² of landuse<br>";}
-    else if (tabNumber == 2) {area_landuse_2.innerHTML = area +" km² of landuse<br>";}
-    else if (tabNumber == 3) {area_landuse_3.innerHTML = area +" km² of landuse<br>" ;}
+    if (tabNumber === 0) {area_landuse_0.innerHTML = area+" km² of landuse<br>" ;}//+ landuse_count.length +  "<i> landuse count?<i>" ;}
+    else if (tabNumber === 1) {area_landuse_1.innerHTML = area +" km² of landuse<br>";}
+    else if (tabNumber === 2) {area_landuse_2.innerHTML = area +" km² of landuse<br>";}
+    else if (tabNumber === 3) {area_landuse_3.innerHTML = area +" km² of landuse<br>" ;}
     else {alert("Problème d'onglets, veuillez recharger votre navigateur.");}
     
     // graph landuse
@@ -409,7 +409,7 @@ if (supportsTemplate()) {
   $('.nav-tabs > li > a[data-toggle="tab"]').on('hidden.bs.tab', function (e) {
     // onglet fermé/hidden: $(e.target)
     // onglet ouvert/shown: $(e.relatedTarget)
-    tabNumber = $('.tab-content .tab-pane.active').attr('id').slice(3);
+    tabNumber = Number($('.tab-content .tab-pane.active').attr('id').slice(3));
     tabText = tabNumber.toString();
     var shortenedTitle = $(e.target).text().match(/#.*\|/);
     if (shortenedTitle) {
