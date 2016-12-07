@@ -310,21 +310,22 @@ map_length.locate({setView: true, maxZoom: 16});
 	////////////////////////// landuse
 	
     var landuse_count = [];
-    //count highway
+    var residential_count = [];
+    //count landuse
     $.get("http://overpass.osm.rambler.ru/cgi/xapi?way[landuse=*][bbox="+bbox+"][@newer="+startDate+"][@meta]", function(landuse) {
         
-        var landuse_geojson = osmtogeojson(landuse);
-        var area = 0;
-        for (var i in landuse_geojson.features)
-        {
-        var item = landuse_geojson.features[i];
-        
-        	if (item.geometry.type =="Polygon") {
-            landuse_count.push(item)
-            }
-            else{}
-        
+    var landuse_geojson = osmtogeojson(landuse);
+    var area_landuse = 0;
+    var area_residential = 0;
+    for (var i in landuse_geojson.features) {
+      var item = landuse_geojson.features[i];
+      if (item.geometry.type =="Polygon") {
+        landuse_count.push(item);
+        if (item.properties.tags.landuse === "residential") {
+          residential_count.push(item);
         }
+      }
+    }
 //    loading();
     
     var style_landuse = {
@@ -339,22 +340,29 @@ map_length.locate({setView: true, maxZoom: 16});
     
         landuse_layer.bringToBack();
     
-    for (var i in landuse_count)
-    {
-    var area_obj = turf.area(landuse_count[i]);
-        area = area+area_obj;
-    landuse_count[i].properties.size = area_obj/1000000;
-    }
+    for (var i in landuse_count) {
+      var area_obj = turf.area(landuse_count[i]);
+      area_landuse += area_obj;
+      landuse_count[i].properties.size = area_obj/1000000;
+    }  
+    area_landuse /= 1000000;
+    area_landuse = Math.round(area_landuse * 100) / 100;
     
-    area = area/1000000;
-    area = Math.round(area * 100) / 100;
-    
+   for (var i in residential_count) {
+      var area_obj = turf.area(residential_count[i]);
+      area_residential += area_obj;
+//      residential_count[i].properties.size = area_obj/1000000; // interest?
+    }  
+    area_residential /= 1000000;
+    area_residential = Math.round(area_residential * 100) / 100;
+
     // awful but needs further comprehension to be improved
-    if (tabNumber === 0) {area_landuse_0.innerHTML = area+" km² of landuse<br>" ;}//+ landuse_count.length +  "<i> landuse count?<i>" ;}
-    else if (tabNumber === 1) {area_landuse_1.innerHTML = area +" km² of landuse<br>";}
-    else if (tabNumber === 2) {area_landuse_2.innerHTML = area +" km² of landuse<br>";}
-    else if (tabNumber === 3) {area_landuse_3.innerHTML = area +" km² of landuse<br>" ;}
+    if (tabNumber === 0) {area_landuse_0.innerHTML = area_landuse+" km² of landuse<br>"+ area_residential +" km² of residential landuse" ;}
+    else if (tabNumber === 1) {area_landuse_1.innerHTML = area_landuse +" km² of landuse<br>"+ area_residential +" km² of residential landuse" ;}
+    else if (tabNumber === 2) {area_landuse_2.innerHTML = area_landuse +" km² of landuse<br>"+ area_residential +" km² of residential landuse" ;}
+    else if (tabNumber === 3) {area_landuse_3.innerHTML = area_landuse +" km² of landuse<br>"+ area_residential +" km² of residential landuse" ;}
     else {alert("Problème d'onglets, veuillez recharger votre navigateur.");}
+
     
     // graph landuse
     var ndx2;
