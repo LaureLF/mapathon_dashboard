@@ -137,7 +137,7 @@ function createDashboard(task,startDate, endDate=null) {
     var map = L.map($(".tab-pane.active .js-map")[0]).setView([0,0 ], 4);
 
     var OpenMapSurfer_Grayscale = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roadsg/x={x}&y={y}&z={z}', {
-	attribution: 'Map tiles by <a href="" target="_blank">korona.geog.uni-heidelberg.de</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, ODbL',
+	attribution: 'Map tiles by <a href="" target="_blank">korona.geog.uni-heidelberg.de</a> <br>Map data &copy; <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, <a href="http://opendatacommons.org/licenses/odbl/1.0/" target="_blank">ODbL</a>',
 	maxZoom: 19,
 	}).addTo(map);
 
@@ -145,7 +145,7 @@ function createDashboard(task,startDate, endDate=null) {
 var map_length = L.map($('.tab-pane.active .js-map_length')[0], { zoomControl:false, attributionControl: true }).setView([0,0 ], 4);
 map_length.locate({setView: true, maxZoom: 16});
     var bm_length  = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.{ext}', {
-	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, ODbL',
+	attribution: 'Map tiles by <a href="http://stamen.com" target="_blank">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC BY 3.0</a> <br>Map data &copy; <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, <a href="http://opendatacommons.org/licenses/odbl/1.0/" target="_blank">ODbL</a>',
 	subdomains: 'abcd',
 	minZoom: 0,
 	maxZoom: 20,
