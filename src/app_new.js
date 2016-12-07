@@ -37,11 +37,16 @@ function init() {
       (key in parameters) ? parameters[key].push(value) : parameters[key] = [value];
     })
 
-    for (var i = 0; i < 4; i++, tabNumber++, tabNumber %= 4) {
-      if (('task'+tabText in parameters) && ('start'+tabText in parameters)) {
-        $('.nav-tabs li:eq('+tabText+') a').tab('show');
-        getTask(parameters['task'+tabText], parameters["start"+tabText]);
-        break;
+    for (var i = 0, first = true; i < 4; i++, tabNumber++, tabNumber %= 4) {
+      tab = tabNumber.toString();
+      if (('task'+tab in parameters) && ('start'+tab in parameters)) {
+        if (first) {
+          $('.nav-tabs li:eq('+tab+') a').tab('show');
+          getTask(parameters['task'+tab], parameters["start"+tab]);
+          first = false;
+        } else {
+          $('.nav-tabs li:eq('+tab+') a').text('# '+parameters['task'+tab]);
+        }
       }
     }
   }
@@ -119,7 +124,7 @@ function createDashboard(task,startDate, endDate=null) {
     
     var longName = "Task # "+task.id+" | "+task.properties.name;
     var tabName = longName.length <= 30 ? longName : longName.substring(5,30)+" …";
-    
+
     document.querySelector(".tab-pane.active .js-task_title").dataset.tabname = tabName;
     $(".nav-tabs > li.active > a").text(tabName);
     $(".tab-pane.active .js-task_title").html("<h3>"+ longName +"</h3>");
