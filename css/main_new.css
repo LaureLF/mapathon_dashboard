@@ -106,6 +106,9 @@ body {
 /*  background-color: yellow;*/
   min-height:20px;
 }
+.dc-chart .pie-slice {
+  fill: black;
+}
 .js-map_length {
   min-height:100px;
 }

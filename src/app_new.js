@@ -34,16 +34,30 @@ function init() {
       var value = s[1] && decodeURIComponent(s[1]);
       (key in parameters) ? parameters[key].push(value) : parameters[key] = [value];
     })
-// if task1 et start1: ci-dessous, else if task2 et start2 etc.
-    d3.json("http://tasks.hotosm.org/project/"+parameters['task'+tabNumber]+".json", function(task) { 
-      if (!task) {
-        alert ("This task does not exist or you do not have permission to access it.");
-      } else if (task.geometry) {
-        createDashboard(task,parameters["start"+tabNumber]);
-      } else {
+
+    for (var i = 0; i < 4; i++, tabNumber++, tabNumber %= 4) {
+      if (('task'+tabNumber.toString() in parameters) && ('start'+tabNumber.toString() in parameters)) {
+        $('.nav-tabs li:eq('+tabNumber+') a').tab('show'); // à débugger
+//alert($('.nav-tabs li:eq('+tabNumber+') a').textContent);
+        getTask(parameters['task'+tabNumber], parameters["start"+tabNumber]);
+      }
+    }
+  }
+}
+
+function getTask(taskID, startDate) {
+  if (taskID !== undefined) {
+    d3.json("http://tasks.hotosm.org/project/"+ taskID +".json", function(task) { 
+      if (task && task.geometry) {
+        createDashboard(task, startDate);
+      } else if (task) {
         alert("This task has no geometry attribute.");
-      } 
+      } else {
+        alert ("This task does not exist or you do not have permission to access it.");
+      }
     });
+  } else {
+    alert("This task does not exist or you do not have permission to access it.");
   }
 }
 
@@ -109,6 +123,7 @@ function createDashboard(task,startDate, endDate=null) {
     $(".tab-pane.active .js-task_date").html("<p><b>Since :</b> "+moment(startDate.toString()).format("llll")+"</p>");
     $("#km_highways").attr('id', 'km_highways_'+tabNumber);
     $("#area_landuse").attr('id', 'area_landuse_'+tabNumber);
+    $("#buildings").attr('id', 'nb_buildings_'+tabNumber);
     
 //carte principale
     var map = L.map($(".tab-pane.active .js-map")[0]).setView([0,0 ], 4);
@@ -152,9 +167,7 @@ map_length.locate({setView: true, maxZoom: 16});
         var building_geojson = osmtogeojson(buildings);
         for (var i in building_geojson.features)
         {
-        var item = building_geojson.features[i];
-        
-        
+        var item = building_geojson.features[i];        
         
         	if (item.geometry.type =="Polygon") {
             buildings_count.push(item)
@@ -174,8 +187,12 @@ map_length.locate({setView: true, maxZoom: 16});
         
         buildings_layer.bringToFront();
         
+        // awful but need to understand first element before improving
+        if (tabNumber == 0) {nb_buildings_0.innerHTML = buildings_count.length +" buildings";} 
+        else if (tabNumber == 1) {nb_buildings_1.innerHTML = buildings_count.length +" buildings";} 
+        else if (tabNumber == 2) {nb_buildings_2.innerHTML = buildings_count.length+" buildings";}
+        else {nb_buildings_3.innerHTML = buildings_count.length+ " buildings";}
         
-    nb_buildings.innerHTML = buildings_count.length;
 //    loading();
     
     });    
@@ -219,10 +236,10 @@ map_length.locate({setView: true, maxZoom: 16});
         length = Math.round(length * 10) / 10;
 
         // awful but need to understand first element before improving
-        if (tabNumber == 1) {km_highways_1.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";} // TODO bon décompte ?
+        if (tabNumber == 0) {km_highways_0.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";} // TODO bon décompte ?
+        else if (tabNumber == 1) {km_highways_1.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
         else if (tabNumber == 2) {km_highways_2.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
-        else if (tabNumber == 3) {km_highways_3.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
-        else {km_highways_4.innerHTML = length+" km of roads<br>"+ highways_count.length +" roades created";}
+        else {km_highways_3.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
     
     // draw line corresponding of length
     var pt1 = turf.point([5.9215,45.58789]);
@@ -323,10 +340,10 @@ map_length.locate({setView: true, maxZoom: 16});
     area = Math.round(area * 100) / 100;
     
     // awful but needs further comprehension to be improved
-    if (tabNumber == 1) {area_landuse_1.innerHTML = area+" km² of landuse<br>" ;}//+ landuse_count.length +  "<i> landuse count?<i>" ;}
-    else if (tabNumber == 2) {area_landuse_2.innerHTML = area;}
-    else if (tabNumber == 3) {area_landuse_3.innerHTML = area;}
-    else {area_landuse_4.innerHTML = area;}        
+    if (tabNumber == 0) {area_landuse_0.innerHTML = area+" km² of landuse<br>" ;}//+ landuse_count.length +  "<i> landuse count?<i>" ;}
+    else if (tabNumber == 1) {area_landuse_1.innerHTML = area +" km² of landuse<br>";}
+    else if (tabNumber == 2) {area_landuse_2.innerHTML = area +" km² of landuse<br>";}
+    else {area_landuse_3.innerHTML = area +" km² of landuse<br>" ;}        
 //    area_landuse.innerHTML = "<h1>"+area+"</h1>";
     
     // graph landuse
@@ -364,25 +381,25 @@ function supportsTemplate() {
 
 if (supportsTemplate()) {
   // on récupère la div qu'on veut remplir
-  var tab1 = document.querySelector("#tab1");
+  var tab0 = document.querySelector("#tab0");
   // on récupère le template et on le clone
   var formTemplate = document.querySelector('#form-template');
-  var form1 = document.importNode(formTemplate.content, true);
+  var form0 = document.importNode(formTemplate.content, true);
   // on le charge dans le HTML
-  tab1.appendChild(form1);
+  tab0.appendChild(form0);
 
   // idem avec une autre div à remplir avec le même template
+  var tab1 = document.querySelector("#tab1");
+  var form1 = document.importNode(formTemplate.content, true);
+  tab1.appendChild(form1);
+    
   var tab2 = document.querySelector("#tab2");
   var form2 = document.importNode(formTemplate.content, true);
   tab2.appendChild(form2);
-    
+
   var tab3 = document.querySelector("#tab3");
   var form3 = document.importNode(formTemplate.content, true);
   tab3.appendChild(form3);
-
-  var tab4 = document.querySelector("#tab4");
-  var form4 = document.importNode(formTemplate.content, true);
-  tab4.appendChild(form4);
   
   $('.nav-tabs > li > a[data-toggle="tab"]').on('hidden.bs.tab', function (e) {
     // onglet fermé/hidden: $(e.target)
@@ -395,6 +412,8 @@ if (supportsTemplate()) {
     var newTitle = $(".tab-pane.active .js-task_title").data('tabname')
     if (newTitle != "") {
       $(e.relatedTarget).text(newTitle);
+    } else {
+      init();
     }
   });
 
