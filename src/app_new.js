@@ -1,6 +1,7 @@
 var query = "", 
     parameters = {}, 
-    tabNumber = 0;
+    tabNumber = 0,
+    tabText = "";
 
 function dateTimePick() {
   $('.datetimepicker1').datetimepicker({
@@ -25,6 +26,7 @@ function openForm() {
 function init() {
   query = window.location.search ; 
   tabNumber = $('.tab-content .tab-pane.active').attr('id').slice(3);
+  tabText = tabNumber.toString();
 
   if (query !== "") {
     parameters = {};
@@ -36,10 +38,10 @@ function init() {
     })
 
     for (var i = 0; i < 4; i++, tabNumber++, tabNumber %= 4) {
-      if (('task'+tabNumber.toString() in parameters) && ('start'+tabNumber.toString() in parameters)) {
-        $('.nav-tabs li:eq('+tabNumber+') a').tab('show'); // à débugger
-//alert($('.nav-tabs li:eq('+tabNumber+') a').textContent);
-        getTask(parameters['task'+tabNumber], parameters["start"+tabNumber]);
+      if (('task'+tabText in parameters) && ('start'+tabText in parameters)) {
+        $('.nav-tabs li:eq('+tabText+') a').tab('show');
+        getTask(parameters['task'+tabText], parameters["start"+tabText]);
+        break;
       }
     }
   }
@@ -74,8 +76,9 @@ function loadDashboard() {
 
   if (taskID && startDateValue) {
     tabNumber = $('.tab-content .tab-pane.active').attr('id').slice(3);  
-    var task = "task"+tabNumber;
-    var start = "start"+tabNumber;
+    tabText = tabNumber.toString();
+    var task = "task"+tabText;
+    var start = "start"+tabText;
     if (query === "") {
       history.pushState(null, null, "?"+task+"="+taskID+"&"+start+"="+startDateText);
     } else {
@@ -121,9 +124,9 @@ function createDashboard(task,startDate, endDate=null) {
     $(".nav-tabs > li.active > a").text(tabName);
     $(".tab-pane.active .js-task_title").html("<h3>"+ longName +"</h3>");
     $(".tab-pane.active .js-task_date").html("<p><b>Since :</b> "+moment(startDate.toString()).format("llll")+"</p>");
-    $("#km_highways").attr('id', 'km_highways_'+tabNumber);
-    $("#area_landuse").attr('id', 'area_landuse_'+tabNumber);
-    $("#buildings").attr('id', 'nb_buildings_'+tabNumber);
+    $(".tab-pane.active #km_highways").attr('id', 'km_highways_'+tabText);
+    $(".tab-pane.active #area_landuse").attr('id', 'area_landuse_'+tabText);
+    $(".tab-pane.active #nb_buildings").attr('id', 'nb_buildings_'+tabText);
     
 //carte principale
     var map = L.map($(".tab-pane.active .js-map")[0]).setView([0,0 ], 4);
@@ -191,7 +194,8 @@ map_length.locate({setView: true, maxZoom: 16});
         if (tabNumber == 0) {nb_buildings_0.innerHTML = buildings_count.length +" buildings";} 
         else if (tabNumber == 1) {nb_buildings_1.innerHTML = buildings_count.length +" buildings";} 
         else if (tabNumber == 2) {nb_buildings_2.innerHTML = buildings_count.length+" buildings";}
-        else {nb_buildings_3.innerHTML = buildings_count.length+ " buildings";}
+        else if (tabNumber == 3) {nb_buildings_3.innerHTML = buildings_count.length+ " buildings";}
+        else {alert("Problème d'onglets, veuillez recharger votre navigateur.");}
         
 //    loading();
     
@@ -239,7 +243,8 @@ map_length.locate({setView: true, maxZoom: 16});
         if (tabNumber == 0) {km_highways_0.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";} // TODO bon décompte ?
         else if (tabNumber == 1) {km_highways_1.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
         else if (tabNumber == 2) {km_highways_2.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
-        else {km_highways_3.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
+        else if (tabNumber == 3) {km_highways_3.innerHTML = length+" km of roads<br>"+ highways_count.length +" roads created";}
+        else {alert("Problème d'onglets, veuillez recharger votre navigateur.");}        
     
     // draw line corresponding of length
     var pt1 = turf.point([5.9215,45.58789]);
@@ -343,8 +348,8 @@ map_length.locate({setView: true, maxZoom: 16});
     if (tabNumber == 0) {area_landuse_0.innerHTML = area+" km² of landuse<br>" ;}//+ landuse_count.length +  "<i> landuse count?<i>" ;}
     else if (tabNumber == 1) {area_landuse_1.innerHTML = area +" km² of landuse<br>";}
     else if (tabNumber == 2) {area_landuse_2.innerHTML = area +" km² of landuse<br>";}
-    else {area_landuse_3.innerHTML = area +" km² of landuse<br>" ;}        
-//    area_landuse.innerHTML = "<h1>"+area+"</h1>";
+    else if (tabNumber == 3) {area_landuse_3.innerHTML = area +" km² of landuse<br>" ;}
+    else {alert("Problème d'onglets, veuillez recharger votre navigateur.");}
     
     // graph landuse
     var ndx2;
@@ -405,15 +410,18 @@ if (supportsTemplate()) {
     // onglet fermé/hidden: $(e.target)
     // onglet ouvert/shown: $(e.relatedTarget)
     tabNumber = $('.tab-content .tab-pane.active').attr('id').slice(3);
+    tabText = tabNumber.toString();
     var shortenedTitle = $(e.target).text().match(/#.*\|/);
     if (shortenedTitle) {
       $(e.target).text(shortenedTitle.toString().slice(0,-2));
     }
     var newTitle = $(".tab-pane.active .js-task_title").data('tabname')
-    if (newTitle != "") {
+    if (newTitle === undefined) {
+      if (('task'+tabText in parameters) && ('start'+tabText in parameters)) {
+        getTask(parameters['task'+tabText], parameters["start"+tabText]);
+      }
+    } else if (newTitle != "") {
       $(e.relatedTarget).text(newTitle);
-    } else {
-      init();
     }
   });
 
