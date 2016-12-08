@@ -42,14 +42,17 @@ function init() {
 
     for (var i = 0, first = true; i < 4; i++, tabNumber++, tabNumber %= 4) {
       tab = tabNumber.toString();
-      if (('task'+tab in parameters) && ('start'+tab in parameters)) {
-        if (first) {
-          $('.nav-tabs li:eq('+tab+') a').tab('show');
-          getTask(parameters['task'+tab], parameters["start"+tab]);
-          first = false;
-        } else {
-          $('.nav-tabs li:eq('+tab+') a').text('# '+parameters['task'+tab]);
+      if (first && ('task0' in parameters) && ('start0' in parameters)) {
+        getTask(parameters['task'+tab], parameters["start"+tab]);
+        first = false;
+      } else if (first && ('task'+tab in parameters) && ('start'+tab in parameters)) {
+        if ($('.nav-tabs li:eq('+tab+') a') === $('.tab-content .tab-pane.active')) {
+
         }
+        $('.nav-tabs li:eq('+tab+') a').tab('show');
+        first = false;
+      } else if (('task'+tab in parameters) && ('start'+tab in parameters)) {
+          $('.nav-tabs li:eq('+tab+') a').text('# '+parameters['task'+tab]);
       }
     }
   }
@@ -61,7 +64,10 @@ function getTask(taskID, startDate) {
       var task = JSON.parse(sessionStorage.getItem(taskID));
       createDashboard(task, startDate);
     } else {
-      d3.json("http://tasks.hotosm.org/project/"+ taskID +".json", function(task) { 
+      $.getJSON( "http://tasks.hotosm.org/project/"+ taskID +".json", function( task ) {
+//        });
+
+//      d3.json("http://tasks.hotosm.org/project/"+ taskID +".json", function(task) { 
         if (task && task.geometry) {
           createDashboard(task, startDate);
           if (availableStorage) {
@@ -115,7 +121,7 @@ function loadDashboard() {
 }
 
 function createDashboard(task,startDate, endDate=null) {
-    console.log("Creating the dasboard for task "+task.id+" and start date: "+startDate);
+    console.log("Creating the dasboard for task "+task.id+" and start date: "+startDate+" in tab "+tabText+".");
 
     $(".tab-pane.active > .js-task-choice").hide();
     $(".tab-pane.active .js-dashboard").empty();
@@ -427,13 +433,16 @@ if (supportsTemplate()) {
     // onglet ouvert/shown: $(e.relatedTarget)
     tabNumber = Number($('.tab-content .tab-pane.active').attr('id').slice(3));
     tabText = tabNumber.toString();
+//alert(tabText);
     var shortenedTitle = $(e.target).text().match(/#.*\|/);
     if (shortenedTitle) {
       $(e.target).text(shortenedTitle.toString().slice(0,-2));
     }
     var newTitle = $(".tab-pane.active .js-task_title").data('tabname')
+//alert(newTitle);
     if (newTitle === undefined) {
       if (('task'+tabText in parameters) && ('start'+tabText in parameters)) {
+//alert('getTask from new tab');
         getTask(parameters['task'+tabText], parameters["start"+tabText]);
       }
     } else if (newTitle != "") {
