@@ -1,7 +1,10 @@
 var query = "", 
     parameters = {}, 
     tabNumber = 0,
-    tabText = "";
+    tabText = "",
+    availableStorage = false;
+
+if (typeof sessionStorage!='undefined') {availableStorage = true;}
 
 function dateTimePick() {
   $('.datetimepicker1').datetimepicker({
@@ -54,15 +57,23 @@ function init() {
 
 function getTask(taskID, startDate) {
   if (taskID !== undefined) {
-    d3.json("http://tasks.hotosm.org/project/"+ taskID +".json", function(task) { 
-      if (task && task.geometry) {
-        createDashboard(task, startDate);
-      } else if (task) {
-        alert("This task has no geometry attribute.");
-      } else {
-        alert ("This task does not exist or you do not have permission to access it.");
-      }
-    });
+    if (availableStorage && (taskID in sessionStorage)) {
+      var task = JSON.parse(sessionStorage.getItem(taskID));
+      createDashboard(task, startDate);
+    } else {
+      d3.json("http://tasks.hotosm.org/project/"+ taskID +".json", function(task) { 
+        if (task && task.geometry) {
+          createDashboard(task, startDate);
+          if (availableStorage) {
+            sessionStorage.setItem(taskID, JSON.stringify(task));
+          }
+        } else if (task) {
+          alert("This task has no geometry attribute.");
+        } else {
+          alert ("This task does not exist or you do not have permission to access it.");
+        }
+      });
+    }
   } else {
     alert("This task does not exist or you do not have permission to access it.");
   }
@@ -96,15 +107,7 @@ function loadDashboard() {
       }
       history.pushState(null, null, query.slice(0, -1));
     }
-    d3.json("http://tasks.hotosm.org/project/"+taskID+".json", function(task) { 
-      if (!task) {
-        alert ("This task does not exist or you do not have permission to access it.");
-      } else if (task.geometry) {
-        createDashboard(task,startDateText);
-      } else {
-        alert("This task has no geometry attribute.");
-      } 
-    });
+    getTask(taskID, startDateText);
 
   } else {
     alert("Veuillez remplir tous les champs.");
