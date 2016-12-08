@@ -120,9 +120,6 @@ function createDashboard(task,startDate, tab) {
 //    var tabContent = document.querySelector(".tab-pane.active");
     var tabContent = document.querySelector("#tab"+tab);
     var taskTemplate = document.querySelector('#task-template');
-//    taskTemplate.content.querySelector("#km_highways").setAttribute("id", "km_highways_"+tab);
-//    taskTemplate.content.querySelector("#area_landuse").setAttribute("id", "area_landuse_"+tab);
-//    taskTemplate.content.querySelector("#nb_buildings").setAttribute("id", "nb_buildings_"+tab);
     var dashboard = document.importNode(taskTemplate.content, true);
     tabContent.appendChild(dashboard);
     
@@ -178,7 +175,7 @@ map_length.locate({setView: true, maxZoom: 16});
 
     var bbox = ""+polygon_bounds._southWest.lng+","+polygon_bounds._southWest.lat+","+polygon_bounds._northEast.lng+","+polygon_bounds._northEast.lat+"";
     
-//    loading();
+    loading();
     
     //count buildings
     var buildings_count = [];
@@ -214,7 +211,7 @@ map_length.locate({setView: true, maxZoom: 16});
         else if (tab == 3) {nb_buildings_3.innerHTML = buildings_count.length+ " buildings";}
         else {alert("Problème d'onglets, veuillez recharger votre navigateur.");}
         
-//    loading();
+    loading();
     
     });    
         
@@ -316,7 +313,7 @@ map_length.locate({setView: true, maxZoom: 16});
     .renderLabel(true)
 	.render();
 	
-//	loading();
+    loading();
 	
 	
 	////////////////////////// landuse
@@ -338,7 +335,8 @@ map_length.locate({setView: true, maxZoom: 16});
         }
       }
     }
-//    loading();
+    loading();
+
     
     var style_landuse = {
             "color": "#9ec658",
@@ -456,14 +454,16 @@ if (supportsTemplate()) {
   // TODO Use old templating techniques or libraries.
 }
 
-//var loading_value = 0;
-//function loading() {
-//  loading_value = loading_value+1;
-//  console.log(loading_value);
-//  document.getElementById('loading_bar').style.width= loading_value*25  +'%';
-//  if (loading_value==4){
-//    console.log("loaded");
-//    $("#loading").hide();
-//    $("#foo").hide();
-//  } else {}
-//}
+var loading_value = 0;
+function loading() {
+  var popup = $("#loading_modal")
+  popup.modal("show");
+  loading_value++
+  console.log(loading_value);
+  document.getElementById('loading_bar').style.width= loading_value*25  +'%';
+  if (loading_value==4){
+    console.log("loaded");
+    popup.modal("hide");
+    loading_value = 0;
+  }
+}

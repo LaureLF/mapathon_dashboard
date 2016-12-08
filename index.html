@@ -157,6 +157,7 @@
               </div><!-- /row -->
             </div><!-- /col -->
           </div><!-- /.js-dashboard -->
+
         </template><!-- /#task-template -->
         <!-- END TEMPLATES --> 
         
@@ -164,6 +165,25 @@
     </div><!-- /row -->
   </div>
   <!-- TODO logos class="visible-xs" -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="loading_modal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Please wait...</h1>
+        </div>
+        <div class="modal-body">
+          <div class="progress">
+            <div id="loading_bar" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar">Loading...
+              <span class="sr-only">Loading data</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /modal -->
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
